@@ -13,10 +13,7 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: [
-      process.env.FRONTEND_URL,
-      "https://extraordinary-madeleine-50ec34.netlify.app/",
-    ],
+    origin: [process.env.FRONTEND_URL, "https://chatminds.vercel.app"],
     credentials: true,
   })
 );
