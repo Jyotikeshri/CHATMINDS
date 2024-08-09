@@ -21,7 +21,7 @@ const HomePage = () => {
   console.log("user", user);
   const fetchUserDetails = async () => {
     try {
-      console.log("Token:", document.cookie); // Check the token
+      console.log("Token:", user.token); // Check the token
       const URL = `${import.meta.env.VITE_BACKEND_URL}/api/user-details`;
       const response = await axios({
         url: URL,
