@@ -5,8 +5,12 @@ import getUserDetailsFromToken from "../helpers/getUserDetailsFromToken.js";
 import UserModel from "../Models/UserModel.js";
 import models from "../Models/ConversationModel.js";
 import getConversation from "../helpers/getConversation.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
+
+console.log("url", process.env.FRONTEND_URL);
 
 const { MessageModel, ConversationModel } = models;
 /***socket connection */
