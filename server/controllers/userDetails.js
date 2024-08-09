@@ -17,4 +17,5 @@ async function userDetails(request, response) {
     });
   }
 }
+
 export default userDetails;
