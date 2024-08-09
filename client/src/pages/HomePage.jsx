@@ -45,7 +45,7 @@ const HomePage = () => {
 
   /***socket connection */
   useEffect(() => {
-    const socketConnection = io(import.meta.env.VITE_BACKEND_URL, {
+    const socketConnection = io(import.meta.env.VITE_SOCKET_BACKEND_URL, {
       auth: {
         token: localStorage.getItem("token"),
       },
