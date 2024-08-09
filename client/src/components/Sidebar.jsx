@@ -31,7 +31,7 @@ const Sidebar = () => {
       socketConnection.on("conversation", (data) => {
         console.log("conversation", data);
 
-        const conversationUserData = data.map((conversationUser, index) => {
+        const conversationUserData = data.map((conversationUser) => {
           if (
             conversationUser?.sender?._id === conversationUser?.receiver?._id
           ) {
@@ -54,13 +54,32 @@ const Sidebar = () => {
 
         setAllUser(conversationUserData);
       });
+
+      return () => {
+        socketConnection.off("conversation");
+      };
     }
   }, [socketConnection, user]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/email");
-    localStorage.clear();
+  const handleLogout = async () => {
+    try {
+      // Dispatch the logout action
+      await dispatch(logout());
+
+      // Remove only specific keys related to authentication
+      localStorage.removeItem("authToken"); // Adjust as needed
+
+      // Optionally disconnect socket connection if applicable
+      if (socketConnection) {
+        socketConnection.disconnect();
+      }
+
+      // Redirect to the login page or appropriate page
+      navigate("/email");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Optionally handle errors or notify the user
+    }
   };
 
   return (
@@ -131,66 +150,62 @@ const Sidebar = () => {
             </div>
           )}
 
-          {allUser.map((conv, index) => {
-            return (
-              <NavLink
-                to={"/" + conv?.userDetails?._id}
-                key={conv?._id}
-                className="flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded hover:bg-slate-100 cursor-pointer"
-              >
-                <div>
-                  <Avatar
-                    imageUrl={conv?.userDetails?.profile_pic}
-                    name={conv?.userDetails?.name}
-                    width={40}
-                    height={40}
-                  />
-                </div>
-                <div>
-                  <h3 className="text-ellipsis line-clamp-1 font-semibold text-base">
-                    {conv?.userDetails?.name}
-                  </h3>
-                  <div className="text-slate-500 text-xs flex items-center gap-1">
-                    <div className="flex items-center gap-1">
-                      {conv?.lastMsg?.imageUrl && (
-                        <div className="flex items-center gap-1">
-                          <span>
-                            <FaImage />
-                          </span>
-                          {!conv?.lastMsg?.text && <span>Image</span>}
-                        </div>
-                      )}
-                      {conv?.lastMsg?.videoUrl && (
-                        <div className="flex items-center gap-1">
-                          <span>
-                            <FaVideo />
-                          </span>
-                          {!conv?.lastMsg?.text && <span>Video</span>}
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-ellipsis line-clamp-1">
-                      {conv?.lastMsg?.text}
-                    </p>
+          {allUser.map((conv) => (
+            <NavLink
+              to={"/" + conv?.userDetails?._id}
+              key={conv?._id}
+              className="flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded hover:bg-slate-100 cursor-pointer"
+            >
+              <div>
+                <Avatar
+                  imageUrl={conv?.userDetails?.profile_pic}
+                  name={conv?.userDetails?.name}
+                  width={40}
+                  height={40}
+                />
+              </div>
+              <div>
+                <h3 className="text-ellipsis line-clamp-1 font-semibold text-base">
+                  {conv?.userDetails?.name}
+                </h3>
+                <div className="text-slate-500 text-xs flex items-center gap-1">
+                  <div className="flex items-center gap-1">
+                    {conv?.lastMsg?.imageUrl && (
+                      <div className="flex items-center gap-1">
+                        <span>
+                          <FaImage />
+                        </span>
+                        {!conv?.lastMsg?.text && <span>Image</span>}
+                      </div>
+                    )}
+                    {conv?.lastMsg?.videoUrl && (
+                      <div className="flex items-center gap-1">
+                        <span>
+                          <FaVideo />
+                        </span>
+                        {!conv?.lastMsg?.text && <span>Video</span>}
+                      </div>
+                    )}
                   </div>
-                </div>
-                {Boolean(conv?.unseenMsg) && (
-                  <p className="text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-blue-500 text-white font-semibold rounded-full">
-                    {conv?.unseenMsg}
+                  <p className="text-ellipsis line-clamp-1">
+                    {conv?.lastMsg?.text}
                   </p>
-                )}
-              </NavLink>
-            );
-          })}
+                </div>
+              </div>
+              {Boolean(conv?.unseenMsg) && (
+                <p className="text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-blue-500 text-white font-semibold rounded-full">
+                  {conv?.unseenMsg}
+                </p>
+              )}
+            </NavLink>
+          ))}
         </div>
       </div>
 
-      {/**edit user details*/}
       {editUserOpen && (
         <EditUserDetails onClose={() => setEditUserOpen(false)} user={user} />
       )}
 
-      {/**search user */}
       {openSearchUser && (
         <SearchUser onClose={() => setOpenSearchUser(false)} />
       )}
