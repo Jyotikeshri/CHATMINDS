@@ -21,19 +21,20 @@ const HomePage = () => {
   console.log("user", user);
   const fetchUserDetails = async () => {
     try {
+      console.log("Token:", document.cookie); // Check the token
       const URL = `${import.meta.env.VITE_BACKEND_URL}/api/user-details`;
       const response = await axios({
         url: URL,
         withCredentials: true,
       });
 
+      console.log("Response data:", response.data);
       dispatch(setUser(response.data.data));
 
       if (response.data.data.logout) {
         dispatch(logout());
         navigate("/email");
       }
-      console.log("current user Details", response);
     } catch (error) {
       console.log("error", error);
     }
